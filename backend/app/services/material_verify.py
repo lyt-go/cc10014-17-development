@@ -4,6 +4,7 @@ from __future__ import annotations
 from typing import Any
 
 from app.services.base import BaseModuleService
+from app.services.material_substitution import MaterialSubstitutionService
 from app.store import store
 
 
@@ -60,4 +61,9 @@ class MaterialVerifyService(BaseModuleService):
                 if ws_row.get("所需工匠", "") == material_name:
                     ws_row["abnormal"] = True
                     effects.append(dict(ws_row))
+            # 联动：引用该核验单的材料替代建议（含已生效批次的迟到退回回执）
+            # 一律转为待复核并冻结领用，避免施工方领用到待复核材料
+            substitution_service = MaterialSubstitutionService()
+            for sub_row in substitution_service.mark_verify_returned(entry_id):
+                effects.append(sub_row)
         return effects

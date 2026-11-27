@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import concurrent.futures
+import copy
 import threading
 import time
 
@@ -38,7 +39,7 @@ def reset_store():
     from app.seed import SEED_ROWS
     for name in list(store._tables.keys()):
         if name in SEED_ROWS:
-            store._tables[name] = [dict(row) for row in SEED_ROWS[name]]
+            store._tables[name] = copy.deepcopy(SEED_ROWS[name])
         else:
             store._tables[name] = []
     yield

@@ -29,3 +29,21 @@ class EntryPayload(BaseModel):
 class ActionPayload(BaseModel):
     action: str
     remark: str | None = None
+
+
+class BatchAdoptPayload(BaseModel):
+    substitution_ids: list[int] = Field(default_factory=list)
+    applicant: str | None = None
+
+
+class RequisitionPayload(BaseModel):
+    receiver: str | None = None
+    quantity: Any | None = None
+
+
+class RejectPayload(BaseModel):
+    reason: str | None = None
+
+
+class RevisePayload(BaseModel):
+    values: dict[str, Any] = Field(default_factory=dict)

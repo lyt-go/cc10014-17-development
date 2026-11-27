@@ -4,6 +4,7 @@
 """
 from __future__ import annotations
 
+import copy
 import threading
 import time
 from typing import Any
@@ -15,8 +16,9 @@ class Store:
     _lock = threading.RLock()
 
     def __init__(self) -> None:
+        # 深拷贝：替代建议的领用记录、方案的结构化清单等嵌套容器不能跨实例共享
         self._tables: dict[str, list[dict[str, Any]]] = {
-            name: [dict(row) for row in rows] for name, rows in SEED_ROWS.items()
+            name: copy.deepcopy(rows) for name, rows in SEED_ROWS.items()
         }
         # 幂等追踪：{(module, entry_id, action, idempotency_key): timestamp}
         self._idempotent_log: dict[tuple, float] = {}

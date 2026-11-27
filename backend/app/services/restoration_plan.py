@@ -62,4 +62,20 @@ class RestorationPlanService(BaseModuleService):
             {"id": r.get("id"), "工艺要求": r.get("方案编号"), "材料清单": r.get("材料清单")}
             for r in store.rows(self.MODULE) if r.get("status") == "已通过"
         ]
+        # 方案审批入口需要的替代采纳视图：待审清单、待复核（禁止领用）与工艺变更记录
+        substitution_rows = store.rows("material_substitution")
+        base["substitution_overview"] = [
+            {
+                "id": r.get("id"),
+                "方案ID": r.get("方案ID"),
+                "清单行号": r.get("清单行号"),
+                "替代材料名称": r.get("替代材料名称"),
+                "核验单ID": r.get("核验单ID"),
+                "替代状态": r.get("status"),
+                "批次号": r.get("批次号"),
+                "变更签证ID": r.get("变更签证ID"),
+                "退回回执": r.get("退回回执", False),
+            }
+            for r in substitution_rows
+        ]
         return base

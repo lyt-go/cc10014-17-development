@@ -53,6 +53,7 @@ npm run dev
 | 建筑勘查 | `building_survey` | 勘查记录 | 建筑名称、勘查部位、病害类型 |
 | 修缮方案 | `restoration_plan` | 修缮方案 | 方案编号、对应勘查、修缮工艺 |
 | 材料核验 | `material_verify` | 材料核验单 | 材料名称、规格型号、供应商 |
+| 材料替代 | `material_substitution` | 材料替代建议 | 原清单行、替代规格、核验单ID、替代状态、批次号 |
 | 工匠分配 | `craftsman_assign` | 工匠分配单 | 工匠姓名、技艺类别、资质等级 |
 | 工序编排 | `work_sequence` | 工序卡 | 工序名称、前置工序、所需工匠 |
 | 质量检查 | `quality_inspect` | 检查记录 | 检查工序、检查项目、技术标准 |
@@ -76,6 +77,35 @@ npm run dev
   `frontend/src/domain/<模块>.ts`，用于承载真实业务差异并维持36题位容量。
 - 列表接口统一返回 `{ items, total, page, size }`，动作接口统一返回 `{ ok, message }`。
 - 状态流转只允许在 `app/services` 里改，路由层不做业务判断。
+
+## 材料替代批量采纳
+
+工程师在「替代批量采纳」工作台（路由 `/material-substitution`）从材料核验中为
+同一修缮方案选择多条替代建议，批量提交后逐行回执：
+
+- 一条替代必须挂靠并保留原清单行（材料/规格/用量/单位快照）、替代规格和对应核验单，
+  原清单行任何环节都不被覆盖。
+- 核验单已签认且用量单位一致才生效；核验未签认（含退回中）或单位不一致的建议
+  退回复核，单位不一致时绝不沿用旧单位数值。
+- 每个生效批次生成一条工艺变更记录（`change_order` 变更签证），确认结果同步到
+  方案的 `substitution_pending` 待审清单，审核时据此操作；待复核行进入
+  `substitution_recheck` 并标明禁止领用。
+- 核验单退回（含已生效后的迟到退回回执）联动替代建议转待复核并冻结领用；
+  施工方只能领用 `已生效` 且核验仍有效的材料，已发生的领用记录归档在方案
+  `requisition_archive` 中，拒绝或退回都不会删除。
+- 重复提交已生效替换幂等跳过，只生效一次、不新增材料行；被拒绝/待复核的清单行
+  修订替代侧信息（原清单行不可改）后可重新提交。
+- 可独立施工的清单行互不阻塞：同批中一条退回不影响另一条采纳。
+
+专用接口（见 `backend/app/routers/substitution.py`）：
+
+| 方法 | 路径 | 用途 |
+| --- | --- | --- |
+| POST | `/api/material-substitution/plans/{plan_id}/batch-adopt` | 批量采纳，返回逐行回执 |
+| GET | `/api/material-substitution/plans/{plan_id}/eligibility` | 方案审批资格视图 |
+| POST | `/api/material-substitution/{id}/requisition` | 施工方领用（待复核自动拦截） |
+| POST | `/api/material-substitution/{id}/reject` | 审核拒绝清单行替换 |
+| POST | `/api/material-substitution/{id}/revise` | 申请人修订后重新提交 |
 
 领域：应用开发
 子方向：web前端/全栈开发

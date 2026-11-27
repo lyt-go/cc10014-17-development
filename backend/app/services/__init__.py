@@ -5,6 +5,7 @@ from app.services.base import BaseModuleService
 from app.services.building_survey import BuildingSurveyService
 from app.services.restoration_plan import RestorationPlanService
 from app.services.material_verify import MaterialVerifyService
+from app.services.material_substitution import MaterialSubstitutionService
 from app.services.craftsman_assign import CraftsmanAssignService
 from app.services.work_sequence import WorkSequenceService
 from app.services.quality_inspect import QualityInspectService
@@ -25,6 +26,7 @@ SERVICES: dict[str, BaseModuleService] = {
     "building_survey": BuildingSurveyService(),
     "restoration_plan": RestorationPlanService(),
     "material_verify": MaterialVerifyService(),
+    "material_substitution": MaterialSubstitutionService(),
     "craftsman_assign": CraftsmanAssignService(),
     "work_sequence": WorkSequenceService(),
     "quality_inspect": QualityInspectService(),

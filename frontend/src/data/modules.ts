@@ -36,6 +36,17 @@ export const MODULES: ModuleMeta[] = [
     metrics: ["核验单总数", "已签认材料", "待核验材料"],
   },
   {
+    key: "material_substitution",
+    name: "材料替代建议",
+    entity: "材料替代建议",
+    desc: "工程师从材料核验中为修缮方案清单行挑选替代材料，批量采纳入口在「替代批量采纳」工作台，单位不一致或核验未签认的建议退回复核。",
+    fields: ["方案ID", "清单行号", "原材料名称", "原规格型号", "原用量", "原单位", "替代材料名称", "替代规格型号", "替代用量", "替代单位", "核验单ID", "复核原因", "备注说明"],
+    statuses: ["待采纳", "待复核", "已生效", "已拒绝"],
+    actions: [],
+    actionTargets: {},
+    metrics: ["替代建议总数", "已生效替换", "待复核建议"],
+  },
+  {
     key: "craftsman_assign",
     name: "工匠分配",
     entity: "工匠分配单",
